@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+/*
+ * One theme (dark), one accent. The accent is the app's own "work" orange.
+ * Radius rule: interactive = pill, containers = 1.5rem, phone frames = 2.75rem.
+ */
+@theme {
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, monospace;
+
+  --color-bg: #0b0a0a;
+  --color-surface: #151312;
+  --color-surface-2: #1e1b19;
+  --color-line: rgb(255 255 255 / 0.09);
+  --color-ink: #f4f1ee;
+  --color-muted: #a8a09a;
+  --color-accent: #e8593c;
+  --color-accent-ink: #160d0a;
+
+  --radius-panel: 1.5rem;
+  --radius-phone: 2.75rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-bg);
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+    font-weight: 620;
+  }
+  p, li { text-wrap: pretty; }
+
+  ::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+  a { text-underline-offset: 0.2em; }
+
+  /* Browser surfaces carry the design too. */
+  * { scrollbar-width: thin; scrollbar-color: var(--color-surface-2) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--color-surface-2); border-radius: 999px; border: 2px solid var(--color-bg); }
+  ::-webkit-scrollbar-track { background: transparent; }
+  input, textarea { caret-color: var(--color-accent); }
+}
+
+@layer components {
+  .wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 1.25rem; }
+  @media (min-width: 768px) { .wrap { padding-inline: 2rem; } }
+
+  .h-display {
+    font-size: clamp(2.5rem, 4.9vw, 4.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.038em;
+  }
+  /* Spanish headlines run about 15% longer; keep the hero to two lines on desktop. */
+  :lang(es) .h-display { font-size: clamp(2.3rem, 4.25vw, 4rem); }
+  .h-section {
+    font-size: clamp(2rem, 3.8vw, 3.35rem);
+    line-height: 1.06;
+    letter-spacing: -0.032em;
+  }
+  .lede { color: var(--color-muted); max-width: 46ch; }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Buttons: pills. */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    height: 3.25rem; padding-inline: 1.6rem; border-radius: 999px;
+    font-weight: 600; font-size: 1rem; line-height: 1; white-space: nowrap;
+    transition: transform 0.25s var(--ease-out-expo), background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn:active { transform: translateY(1px) scale(0.98); }
+  .btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+  .btn-primary:active { transform: translateY(1px) scale(0.98); }
+  .btn-ghost { border: 1px solid var(--color-line); color: var(--color-ink); }
+  .btn-dark { background: var(--color-accent-ink); color: var(--color-ink); }
+  /* Hover only where a real pointer exists, so touch never gets a stuck hover. */
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { background: #f06a4e; transform: translateY(-2px); }
+    .btn-ghost:hover { background: var(--color-surface); border-color: rgb(255 255 255 / 0.18); }
+    .btn-dark:hover { background: #000; transform: translateY(-2px); }
+  }
+  .btn-sm { height: 2.75rem; padding-inline: 1.15rem; font-size: 0.9375rem; }
+
+  /* Phone frame around a real screenshot. */
+  .phone {
+    border-radius: var(--radius-phone);
+    padding: 0.4rem;
+    background: #050404;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.16),
+      0 2px 3px rgb(0 0 0 / 0.5),
+      0 45px 70px -35px rgb(0 0 0 / 0.9),
+      0 30px 70px -50px rgb(232 89 60 / 0.4);
+    line-height: 0;
+  }
+  .phone img {
+    display: block; width: 100%; height: auto;
+    border-radius: calc(var(--radius-phone) - 0.4rem);
+    aspect-ratio: 828 / 1800;
+    background: #000;
+  }
+
+  .panel { border-radius: var(--radius-panel); background: var(--color-surface); }
+
+  /* FAQ disclosure */
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] > summary .plus { transform: rotate(45deg); }
+  .plus { transition: transform 0.3s var(--ease-out-expo); }
+
+  /* Accordion opens by growing, where the browser supports animating to auto.
+     Elsewhere it simply opens, which is the correct fallback. */
+  @supports (interpolate-size: allow-keywords) {
+    :root { interpolate-size: allow-keywords; }
+    details::details-content {
+      block-size: 0;
+      opacity: 0;
+      overflow: clip;
+      transition:
+        block-size 0.3s var(--ease-out-expo),
+        opacity 0.2s ease-out,
+        content-visibility 0.3s allow-discrete;
+    }
+    details[open]::details-content { block-size: auto; opacity: 1; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
